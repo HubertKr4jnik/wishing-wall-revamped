@@ -13,19 +13,18 @@ export default function Navbar() {
   }
 
   if (status === "authenticated") {
-    console.log(session.user);
     return (
       <div className="flex flex-row p-6 w-11/12 mx-auto justify-between place-items-center">
         <div className="flex flex-row gap-2 text-xl font-bold place-items-center">
           <img
             className="h-11 rounded-full shadow-2xl/100"
-            src={session.user?.image}
+            src={session.user?.image as any}
             alt="Profile Picture"
           />
           <p className="text-shadow-lg">{session.user?.name}</p>
         </div>
         <button
-          className="flex rounded px-3 py-2 h-10 gap-2 text-black text-lg cursor-pointer bg-slate-200 hover:scale-105 transition-all"
+          className="flex rounded px-3 py-2 h-10 gap-2 text-black text-lg cursor-pointer bg-slate-100 hover:scale-105 transition-all"
           onClick={() => signOut()}
         >
           <p className="hidden md:block lg:block">Sign Out</p>
