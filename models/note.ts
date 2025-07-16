@@ -6,6 +6,8 @@ const noteSchema = new mongoose.Schema({
   userId: { type: String },
   username: { type: String },
   profileURL: { type: String },
+  likes: { type: Number },
+  likedBy: { type: Array },
 });
 
 const Note = mongoose.models.Note || mongoose.model("Note", noteSchema);

@@ -1,10 +1,9 @@
 "use client";
-
 import axios from "axios";
 import { useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 
-export default function AddNote({ setAddingVisible }) {
+export default function AddNotePopup({ setAddingVisible }) {
   const { data: session, status } = useSession();
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
