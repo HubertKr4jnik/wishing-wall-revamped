@@ -1,14 +1,22 @@
 "use client";
 
 export default function Note({ title, desc, username, profileURL, noteKey }) {
+  let randomRotate = 0;
+  let random = Math.floor(Math.random() * 100);
+  if (random <= 33) {
+    randomRotate = 359;
+  }
+  if (random > 33 && random <= 66) {
+    randomRotate = 1;
+  }
   return (
     <div
-      className="w-full h-fit bg-amber-200 text-black p-4 shadow-xl/50 mb-6"
+      className={`min-w-fit max-w-full min-h-fit max-h-full bg-amber-200 text-black p-4 shadow-xl/50 resize-x overflow-auto flex-auto rotate-${randomRotate}`}
       onClick={() => console.log(noteKey)}
     >
       <h2 className="font-bold text-xl">{title}</h2>
-      <p className="pb-2">{desc}</p>
-      <div className="flex flex-row justify-between place-items-center">
+      <p className="pb-3 wrap-anywhere">{desc}</p>
+      <div className="flex flex-row justify-between place-items-center gap-x-4">
         <div className="flex flex-row gap-2 justify-center place-items-center">
           <img
             src={profileURL}

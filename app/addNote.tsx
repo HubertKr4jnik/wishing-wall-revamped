@@ -11,6 +11,7 @@ export default function AddNote({ setAddingVisible }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setAddingVisible(false);
     try {
       let userId, username, profileURL;
       if (session?.user) {
@@ -61,6 +62,7 @@ export default function AddNote({ setAddingVisible }) {
             type="text"
             name=""
             id="noteTitleInput"
+            autoComplete="off"
             className="h-10 border-2 border-slate-400 rounded mb-4"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
