@@ -8,6 +8,13 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+    remotePatterns: [
+      new URL("https://avatars.slack-edge.com/**"),
+      new URL("https://cdn-icons-png.flaticon.com/**"),
+      new URL("https://me.micahrl.com/**"),
+    ],
+  },
 };
 
 export default nextConfig;

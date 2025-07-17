@@ -2,6 +2,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 
 export default function AddNotePopup({ setAddingVisible }) {
   const { data: session, status } = useSession();
@@ -37,22 +38,31 @@ export default function AddNotePopup({ setAddingVisible }) {
         className="absolute h-screen w-full top-0 left-0 bg-black/[.5]"
         onClick={() => setAddingVisible(false)}
       ></div>
-      <div className="w-10/12 h-fit md:w-2/3 md:h-1/2 lg:w-1/2 lg:h-1/2 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-200 px-12 py-6 rounded-xl text-black">
-        <form className="h-full w-full flex flex-col" onSubmit={handleSubmit}>
+      <div className="w-10/12 h-fit md:w-2/3 md:h-1/2 lg:w-1/2 lg:h-1/2 min-h-fit absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-200 px-12 py-6 rounded-xl text-black">
+        <form
+          className="h-full min-h-fit w-full flex flex-col"
+          onSubmit={handleSubmit}
+        >
           <div className="mx-auto flex gap-2 place-items-center pb-4">
-            <img
-              src="https://me.micahrl.com/blog/sparkles-emoji-dot-ico/sparkles.svg"
-              alt=""
-              className="h-8"
-            />
+            <div className="relative h-8 aspect-square">
+              <Image
+                src="https://me.micahrl.com/blog/sparkles-emoji-dot-ico/sparkles.svg"
+                alt=""
+                className="h-full"
+                fill
+              />
+            </div>
             <h1 className="font-bold text-xl md:text-2xl lg:text-2xl">
               Make a wish
             </h1>
-            <img
-              src="https://me.micahrl.com/blog/sparkles-emoji-dot-ico/sparkles.svg"
-              alt=""
-              className="h-8"
-            />
+            <div className="relative h-8 aspect-square">
+              <Image
+                src="https://me.micahrl.com/blog/sparkles-emoji-dot-ico/sparkles.svg"
+                alt=""
+                className="h-full"
+                fill
+              />
+            </div>
           </div>
           <label htmlFor="noteTitleInput" className="font-bold">
             Title
@@ -72,7 +82,7 @@ export default function AddNotePopup({ setAddingVisible }) {
           <textarea
             name=""
             id="noteDescInput"
-            className="h-35 border-2 border-slate-400 rounded mb-4 resize-none"
+            className="h-35 min-h-30 border-2 border-slate-400 rounded mb-4 resize-none"
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
           ></textarea>

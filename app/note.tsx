@@ -1,7 +1,18 @@
 "use client";
 import axios from "axios";
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
+import Image from "next/image";
+
+interface NoteProps {
+  noteId: string;
+  title: string;
+  desc: string;
+  username: string;
+  profileURL: string;
+  _likes: number;
+  _likedBy: Array<string>;
+}
 
 export default function Note({
   noteId,
@@ -11,7 +22,7 @@ export default function Note({
   profileURL,
   _likes,
   _likedBy,
-}) {
+}: NoteProps) {
   const { data: session, status } = useSession();
   const [rotaion, setRotation] = useState("rotate-[0deg]");
   const generateRotation = () => {
@@ -23,24 +34,37 @@ export default function Note({
       setRotation("rotate-[0.5deg]");
     }
   };
-  generateRotation();
+
+  useEffect(() => {
+    generateRotation();
+  }, []);
 
   const [likedBy, setLikedBy] = useState(_likedBy);
+  const [heartImageURL, setHeartImageURL] = useState(
+    "https://cdn-icons-png.flaticon.com/512/2589/2589197.png"
+  );
 
-  let heartImageURL = "https://cdn-icons-png.flaticon.com/512/2589/2589197.png";
-  if (likedBy.includes(session?.user.slackId)) {
-    heartImageURL = "https://cdn-icons-png.flaticon.com/512/2589/2589054.png";
-  }
+  useEffect(() => {
+    if (session?.user && likedBy.includes((session?.user as any).slackId)) {
+      setHeartImageURL(
+        "https://cdn-icons-png.flaticon.com/512/2589/2589054.png"
+      );
+    }
+  }, [session?.user, likedBy]);
 
   const [likes, setLikes] = useState(_likes);
-  const handleLikeUpdate = async (e) => {
-    e.target.src = "https://cdn-icons-png.flaticon.com/512/2589/2589054.png";
-    const userId = session?.user.slackId;
-    const response = await axios.post("/api/notes/like", {
-      noteId,
-      userId,
-    });
-    setLikes(response.data.likes);
+  const handleLikeUpdate = async () => {
+    if (status === "authenticated") {
+      setHeartImageURL(
+        "https://cdn-icons-png.flaticon.com/512/2589/2589054.png"
+      );
+      const userId = (session?.user as any).slackId;
+      const response = await axios.post("/api/notes/like", {
+        noteId,
+        userId,
+      });
+      setLikes(response.data.likes);
+    }
   };
   return (
     <div
@@ -51,39 +75,27 @@ export default function Note({
       <p className="pb-3 wrap-anywhere">{desc}</p>
       <div className="flex flex-row justify-between place-items-center gap-x-4">
         <div className="flex flex-row gap-2 justify-center place-items-center">
-          <img
-            src={profileURL}
-            alt="Profile Picture"
-            className="h-10 rounded-full shadow-2xl/100"
-          />
+          <div className="relative h-10 aspect-square">
+            <Image
+              src={profileURL}
+              alt="Profile Picture"
+              className="h-full rounded-full"
+              fill
+            />
+          </div>
           <p className="flex place-items-center">{username}</p>
         </div>
         <div className="flex flex-row gap-1 justify-center place-items-center">
           <p className="text-xl">{likes}</p>
-          {heartImageURL ==
-          "https://cdn-icons-png.flaticon.com/512/2589/2589197.png" ? (
-            <img
+          <div className="relative h-7 aspect-square">
+            <Image
               src={heartImageURL}
-              alt=""
-              className="h-7 cursor-pointer hover:scale-110 transition-all"
-              onMouseOver={(e) =>
-                (e.target.src =
-                  "https://cdn-icons-png.flaticon.com/512/2589/2589054.png")
-              }
-              onMouseOut={(e) =>
-                (e.target.src =
-                  "https://cdn-icons-png.flaticon.com/512/2589/2589197.png")
-              }
-              onClick={(e) => handleLikeUpdate(e)}
+              alt="Profile Picture"
+              className="h-full hover:scale-110 transition-all"
+              fill
+              onClick={handleLikeUpdate}
             />
-          ) : (
-            <img
-              src={heartImageURL}
-              alt=""
-              className="h-7 hover:scale-110 transition-all"
-              onClick={(e) => handleLikeUpdate(e)}
-            />
-          )}
+          </div>
         </div>
       </div>
     </div>
