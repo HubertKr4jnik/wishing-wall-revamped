@@ -16,7 +16,7 @@ export default function Home() {
   const getNotes = async () => {
     try {
       const response = await axios.get("/api/notes/getAll");
-      setNotes(response.data);
+      setNotes(response.data.reverse());
     } catch (err) {
       console.error(err);
     }
@@ -41,6 +41,7 @@ export default function Home() {
               profileURL={note.profileURL}
               _likes={note.likes}
               _likedBy={note.likedBy}
+              _imageURL={note.imageURL}
             />
           );
         })}
@@ -61,7 +62,7 @@ export default function Home() {
         ) : null}
       </div>
       {addingVisible ? (
-        <AddNotePopup setAddingVisible={setAddingVisible} />
+        <AddNotePopup setAddingVisible={setAddingVisible} getNotes={getNotes} />
       ) : null}
     </div>
   );

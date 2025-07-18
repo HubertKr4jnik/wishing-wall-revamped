@@ -1,8 +1,8 @@
 import DatabaseConnection from "@/lib/mongoose";
 import Note from "@/models/note";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req) {
+export async function POST(req: NextRequest) {
   try {
     await DatabaseConnection();
     const { noteId, userId } = await req.json();
@@ -10,10 +10,10 @@ export async function POST(req) {
     const likedBy = foundNote.likedBy;
 
     if (likedBy.includes(userId)) {
-      console.log("nope");
+      console.log("[api/like] [Note already liked, returning it back]");
       return NextResponse.json(foundNote, { status: 200 });
     } else {
-      console.log(noteId);
+      console.log(`[api/like] [Updating note ${noteId}]`);
       const updatedNote = await Note.findByIdAndUpdate(
         noteId,
         { $inc: { likes: 1 }, $push: { likedBy: userId } },

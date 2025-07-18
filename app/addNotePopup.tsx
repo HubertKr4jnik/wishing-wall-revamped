@@ -4,14 +4,29 @@ import { useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 
-export default function AddNotePopup({ setAddingVisible }) {
+export default function AddNotePopup({ setAddingVisible, getNotes }) {
   const { data: session, status } = useSession();
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
+  const [file, setFile] = useState(null);
+
+  const sendSlackMessage = async (userId: string, imageURL: string) => {
+    try {
+      const response = await axios.post("/api/slack/postMessage", {
+        title,
+        desc,
+        userId,
+        imageURL,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const formData = new FormData();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setAddingVisible(false);
     try {
       let userId, username, profileURL;
       if (session?.user) {
@@ -19,14 +34,24 @@ export default function AddNotePopup({ setAddingVisible }) {
         username = session.user.name;
         profileURL = session.user.image;
       }
-      const response = await axios.post("/api/notes/add", {
-        title,
-        desc,
-        userId,
-        username,
-        profileURL,
-      });
-      window.location.reload();
+
+      formData.append("title", title);
+      formData.append("desc", desc);
+      formData.append("userId", userId);
+      if (username) {
+        formData.append("username", username);
+      }
+      if (profileURL) {
+        formData.append("profileURL", profileURL);
+      }
+      if (file) {
+        formData.append("file", file);
+      }
+
+      const response = await axios.post("/api/notes/add", formData);
+      getNotes();
+      setAddingVisible(false);
+      sendSlackMessage(userId, response.data.imageURL);
       console.log(response);
     } catch (err) {
       console.error(err);
@@ -82,10 +107,16 @@ export default function AddNotePopup({ setAddingVisible }) {
           <textarea
             name=""
             id="noteDescInput"
-            className="h-35 min-h-30 border-2 border-slate-400 rounded mb-4 resize-none"
+            className="h-35 min-h-30 border-2 mb-3 border-slate-400 rounded resize-none"
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
           ></textarea>
+          <input
+            type="file"
+            id="noteImageInput"
+            onChange={(e) => setFile(e.target.files[0])}
+            className="font-bold cursor-pointer"
+          />
           <input
             type="submit"
             value="Submit"

@@ -12,6 +12,7 @@ interface NoteProps {
   profileURL: string;
   _likes: number;
   _likedBy: Array<string>;
+  _imageURL: string;
 }
 
 export default function Note({
@@ -22,9 +23,12 @@ export default function Note({
   profileURL,
   _likes,
   _likedBy,
+  _imageURL,
 }: NoteProps) {
   const { data: session, status } = useSession();
   const [rotaion, setRotation] = useState("rotate-[0deg]");
+  const [imageURL, setImageURL] = useState(_imageURL);
+
   const generateRotation = () => {
     let random = Math.floor(Math.random() * 100);
     if (random <= 33) {
@@ -66,13 +70,36 @@ export default function Note({
       setLikes(response.data.likes);
     }
   };
+  const linkRegex = /(https?:\/\/[^\s]+)/g;
+  const preformattedDesc = desc.split(linkRegex);
   return (
     <div
       className={`min-w-fit max-w-full min-h-fit max-h-full bg-amber-200 text-black p-4 shadow-xl/50 resize-x overflow-auto flex-auto ${rotaion} hover:scale-102 ease-in-out transition-all`}
       onMouseEnter={() => generateRotation()}
     >
+      <div
+        className={`relative h-30 mask-b-to-90% bg-center bg-contain bg-no-repeat`}
+        style={{ backgroundImage: `url(${imageURL})` }}
+      ></div>
       <h2 className="font-bold text-xl">{title}</h2>
-      <p className="pb-3 wrap-anywhere">{desc}</p>
+      <p className="pb-2 wrap-anywhere">
+        {preformattedDesc.map((section, index) => {
+          if (linkRegex.test(section)) {
+            return (
+              <a
+                key={index}
+                href={section}
+                target="_blank"
+                className="text-blue-600 underline"
+              >
+                {section}
+              </a>
+            );
+          } else {
+            return section;
+          }
+        })}
+      </p>
       <div className="flex flex-row justify-between place-items-center gap-x-4">
         <div className="flex flex-row gap-2 justify-center place-items-center">
           <div className="relative h-10 aspect-square">
@@ -91,7 +118,12 @@ export default function Note({
             <Image
               src={heartImageURL}
               alt="Profile Picture"
-              className="h-full hover:scale-110 transition-all"
+              className={`h-full hover:scale-110 transition-all cursor-${
+                heartImageURL ===
+                "https://cdn-icons-png.flaticon.com/512/2589/2589197.png"
+                  ? "pointer"
+                  : "default"
+              }`}
               fill
               onClick={handleLikeUpdate}
             />

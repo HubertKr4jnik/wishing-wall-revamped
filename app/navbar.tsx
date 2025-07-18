@@ -25,7 +25,7 @@ export default function Navbar() {
               fill
             />
           </div>
-          <p className="text-shadow-lg">{session.user?.name}</p>
+          <p className="text-white text-shadow-lg">{session.user?.name}</p>
         </div>
         <button
           className="flex rounded px-3 py-2 h-10 gap-2 text-black text-lg cursor-pointer bg-slate-100 hover:scale-105 transition-all"
