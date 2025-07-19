@@ -3,9 +3,16 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: any) {
   try {
-    const { title, desc, userId, imageURL } = await req.json();
+    let { title, desc, userId, imageURL, productLink } = await req.json();
+
+    title = title
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/@/g, "\\@");
+
     console.log(
-      `[/api/slack/postMessage] [Recieved title: ${title} description: ${desc}, userID: ${userId} and imageURL: ${imageURL}]`
+      `[/api/slack/postMessage] [Recieved title: ${title} description: ${desc}, userID: ${userId}, productLink: ${productLink} and imageURL: ${imageURL}]`
     );
     let message = [
       {
@@ -19,14 +26,18 @@ export async function POST(req: any) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `<@${userId}> just wished for \`<https://hc-cdn.hel1.your-objectstorage.com/s/v3/41e9de19cfa4e099cf25410ac38542776693b54e_t.png | ${title}>\``,
+          text: `<@${userId}> just wished for ${
+            productLink === undefined
+              ? `\`${title}\``
+              : `\`<${productLink}|${title}>\``
+          }`,
         },
       },
       {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: ` \_${desc}\_`,
+          text: `_${desc} _`,
         },
       },
     ];

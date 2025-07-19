@@ -13,6 +13,9 @@ interface NoteProps {
   _likes: number;
   _likedBy: Array<string>;
   _imageURL: string;
+  setInfoPopupVisible: Function;
+  setInfoPopupText: Function;
+  setInfoPopupSuccess: Function;
 }
 
 export default function Note({
@@ -24,6 +27,9 @@ export default function Note({
   _likes,
   _likedBy,
   _imageURL,
+  setInfoPopupVisible,
+  setInfoPopupText,
+  setInfoPopupSuccess,
 }: NoteProps) {
   const { data: session, status } = useSession();
   const [rotaion, setRotation] = useState("rotate-[0deg]");
@@ -71,6 +77,10 @@ export default function Note({
       });
       setLikes(response.data.likes);
       setLikedBy(response.data.likedBy);
+    } else {
+      setInfoPopupVisible(true);
+      setInfoPopupSuccess(false);
+      setInfoPopupText("Please Sign in to like");
     }
   };
   const linkRegex = /(https?:\/\/[^\s]+)/g;
@@ -84,7 +94,7 @@ export default function Note({
         className={`relative h-30 mask-b-to-90% bg-center bg-contain bg-no-repeat`}
         style={{ backgroundImage: `url(${imageURL})` }}
       ></div>
-      <h2 className="font-bold text-xl">{title}</h2>
+      <h2 className="font-bold text-xl wrap-anywhere">{title}</h2>
       <p className="pb-2 wrap-anywhere">
         {preformattedDesc.map((section, index) => {
           if (linkRegex.test(section)) {

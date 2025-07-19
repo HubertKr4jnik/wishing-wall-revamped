@@ -4,20 +4,31 @@ import { useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 
-export default function AddNotePopup({ setAddingVisible, getNotes }) {
+export default function AddNotePopup({
+  setAddingVisible,
+  getNotes,
+  setInfoPopupVisible,
+  setInfoPopupText,
+  setInfoPopupSuccess,
+}) {
   const { data: session, status } = useSession();
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [file, setFile] = useState(null);
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const sendSlackMessage = async (userId: string, imageURL: string) => {
+  const sendSlackMessage = async (
+    userId: string,
+    imageURL: string,
+    productLink: string
+  ) => {
     try {
       const response = await axios.post("/api/slack/postMessage", {
         title,
         desc,
         userId,
         imageURL,
+        productLink,
       });
     } catch (err) {
       console.error(err);
@@ -25,11 +36,20 @@ export default function AddNotePopup({ setAddingVisible, getNotes }) {
   };
 
   const formData = new FormData();
+  const linkRegex = /(https?:\/\/[^\s]+)/g;
+  const preformattedDesc = desc.split(linkRegex);
+  let links: any = [];
+
+  preformattedDesc.forEach((section) => {
+    if (linkRegex.test(section)) {
+      links.push(section);
+    }
+  });
 
   const handleSubmit = async (e: Event) => {
-    setFormSubmitted(true);
     e.preventDefault();
     if (title.length > 0 && desc.length > 0 && !formSubmitted) {
+      setFormSubmitted(true);
       try {
         let userId, username, profileURL;
         if (session?.user) {
@@ -54,12 +74,22 @@ export default function AddNotePopup({ setAddingVisible, getNotes }) {
         const response = await axios.post("/api/notes/add", formData);
         getNotes();
         setAddingVisible(false);
-        sendSlackMessage(userId, response.data.imageURL);
+        sendSlackMessage(userId, response.data.imageURL, links[0]);
+        setInfoPopupVisible(true);
+        setInfoPopupSuccess(true);
+        setInfoPopupText("Added note successfully");
         setFormSubmitted(false);
         console.log(response);
       } catch (err) {
         console.error(err);
+        setInfoPopupVisible(true);
+        setInfoPopupSuccess(false);
+        setInfoPopupText("Error adding note");
       }
+    } else {
+      setInfoPopupVisible(true);
+      setInfoPopupSuccess(false);
+      setInfoPopupText("Please provide a title and description");
     }
   };
   return (
@@ -122,7 +152,7 @@ export default function AddNotePopup({ setAddingVisible, getNotes }) {
             type="file"
             id="noteImageInput"
             onChange={(e) => setFile(e.target.files[0])}
-            className="font-bold cursor-pointer"
+            className="font-bold cursor-pointer underline decoration-slate-400 decoration-2"
           />
           <input
             type="submit"
