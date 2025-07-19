@@ -48,6 +48,7 @@ export default function Home() {
               setInfoPopupVisible={setInfoPopupVisible}
               setInfoPopupText={setInfoPopupText}
               setInfoPopupSuccess={setInfoPopupSuccess}
+              getNotes={getNotes}
             />
           );
         })}

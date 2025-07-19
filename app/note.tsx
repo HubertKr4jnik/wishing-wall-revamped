@@ -16,6 +16,7 @@ interface NoteProps {
   setInfoPopupVisible: Function;
   setInfoPopupText: Function;
   setInfoPopupSuccess: Function;
+  getNotes: Function;
 }
 
 export default function Note({
@@ -30,6 +31,7 @@ export default function Note({
   setInfoPopupVisible,
   setInfoPopupText,
   setInfoPopupSuccess,
+  getNotes,
 }: NoteProps) {
   const { data: session, status } = useSession();
   const [rotaion, setRotation] = useState("rotate-[0deg]");
@@ -85,11 +87,37 @@ export default function Note({
   };
   const linkRegex = /(https?:\/\/[^\s]+)/g;
   const preformattedDesc = desc.split(linkRegex);
+
+  const handleNoteDelete = async () => {
+    try {
+      const response = await axios.post("/api/notes/delete", {
+        noteId,
+      });
+      getNotes();
+      setInfoPopupVisible(true);
+      setInfoPopupSuccess(true);
+      setInfoPopupText("Successfully deleted note");
+    } catch (err) {
+      setInfoPopupVisible(true);
+      setInfoPopupSuccess(false);
+      setInfoPopupText("Error deleting note");
+      console.error(err);
+    }
+  };
   return (
     <div
-      className={`max-w-full md:max-w-[45%] lg:max-w-[45%] min-w-1/6 min-h-fit max-h-fit my-auto bg-amber-200 text-black p-4 shadow-xl/50 resize-x overflow-auto flex-auto ${rotaion} hover:scale-102 ease-in-out transition-all`}
+      className={`relative max-w-full md:max-w-[45%] lg:max-w-[45%] min-w-1/6 min-h-fit max-h-fit my-auto bg-amber-200 text-black p-4 shadow-xl/50 resize-x overflow-auto flex-auto ${rotaion} hover:scale-102 ease-in-out transition-all`}
       onMouseEnter={() => generateRotation()}
     >
+      <div className="absolute h-5 aspect-square z-[1] top-3 right-3">
+        <Image
+          src="https://cdn-icons-png.flaticon.com/512/2891/2891771.png"
+          alt="Profile Picture"
+          className="h-full hover:scale-110 cursor-pointer transition-all"
+          fill
+          onClick={handleNoteDelete}
+        />
+      </div>
       <div
         className={`relative h-30 mask-b-to-90% bg-center bg-contain bg-no-repeat`}
         style={{ backgroundImage: `url(${imageURL})` }}

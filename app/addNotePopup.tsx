@@ -86,6 +86,10 @@ export default function AddNotePopup({
         setInfoPopupSuccess(false);
         setInfoPopupText("Error adding note");
       }
+    } else if (formSubmitted) {
+      setInfoPopupVisible(true);
+      setInfoPopupSuccess(false);
+      setInfoPopupText("Don't spam");
     } else {
       setInfoPopupVisible(true);
       setInfoPopupSuccess(false);
