@@ -41,6 +41,7 @@ export default function Home() {
               title={note.title}
               desc={note.desc}
               username={note.username}
+              userId={note.userId}
               profileURL={note.profileURL}
               _likes={note.likes}
               _likedBy={note.likedBy}
