@@ -48,33 +48,36 @@ export default function Note({
     "https://cdn-icons-png.flaticon.com/512/2589/2589197.png"
   );
 
+  const [likes, setLikes] = useState(_likes);
+
   useEffect(() => {
     if (session?.user && likedBy.includes((session?.user as any).slackId)) {
       setHeartImageURL(
         "https://cdn-icons-png.flaticon.com/512/2589/2589054.png"
       );
+    } else {
+      setHeartImageURL(
+        "https://cdn-icons-png.flaticon.com/512/2589/2589197.png"
+      );
     }
   }, [session?.user, likedBy]);
 
-  const [likes, setLikes] = useState(_likes);
   const handleLikeUpdate = async () => {
     if (status === "authenticated") {
-      setHeartImageURL(
-        "https://cdn-icons-png.flaticon.com/512/2589/2589054.png"
-      );
       const userId = (session?.user as any).slackId;
       const response = await axios.post("/api/notes/like", {
         noteId,
         userId,
       });
       setLikes(response.data.likes);
+      setLikedBy(response.data.likedBy);
     }
   };
   const linkRegex = /(https?:\/\/[^\s]+)/g;
   const preformattedDesc = desc.split(linkRegex);
   return (
     <div
-      className={`min-w-fit max-w-full min-h-fit max-h-full bg-amber-200 text-black p-4 shadow-xl/50 resize-x overflow-auto flex-auto ${rotaion} hover:scale-102 ease-in-out transition-all`}
+      className={`max-w-full md:max-w-[45%] lg:max-w-[45%] min-w-1/6 min-h-fit max-h-fit my-auto bg-amber-200 text-black p-4 shadow-xl/50 resize-x overflow-auto flex-auto ${rotaion} hover:scale-102 ease-in-out transition-all`}
       onMouseEnter={() => generateRotation()}
     >
       <div
@@ -118,12 +121,7 @@ export default function Note({
             <Image
               src={heartImageURL}
               alt="Profile Picture"
-              className={`h-full hover:scale-110 transition-all cursor-${
-                heartImageURL ===
-                "https://cdn-icons-png.flaticon.com/512/2589/2589197.png"
-                  ? "pointer"
-                  : "default"
-              }`}
+              className="h-full hover:scale-110 transition-all cursor-pointer"
               fill
               onClick={handleLikeUpdate}
             />

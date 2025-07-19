@@ -9,6 +9,7 @@ export default function AddNotePopup({ setAddingVisible, getNotes }) {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [file, setFile] = useState(null);
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const sendSlackMessage = async (userId: string, imageURL: string) => {
     try {
@@ -25,36 +26,40 @@ export default function AddNotePopup({ setAddingVisible, getNotes }) {
 
   const formData = new FormData();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: Event) => {
+    setFormSubmitted(true);
     e.preventDefault();
-    try {
-      let userId, username, profileURL;
-      if (session?.user) {
-        userId = session.user.slackId;
-        username = session.user.name;
-        profileURL = session.user.image;
-      }
+    if (title.length > 0 && desc.length > 0 && !formSubmitted) {
+      try {
+        let userId, username, profileURL;
+        if (session?.user) {
+          userId = session.user.slackId;
+          username = session.user.name;
+          profileURL = session.user.image;
+        }
 
-      formData.append("title", title);
-      formData.append("desc", desc);
-      formData.append("userId", userId);
-      if (username) {
-        formData.append("username", username);
-      }
-      if (profileURL) {
-        formData.append("profileURL", profileURL);
-      }
-      if (file) {
-        formData.append("file", file);
-      }
+        formData.append("title", title);
+        formData.append("desc", desc);
+        formData.append("userId", userId);
+        if (username) {
+          formData.append("username", username);
+        }
+        if (profileURL) {
+          formData.append("profileURL", profileURL);
+        }
+        if (file) {
+          formData.append("file", file);
+        }
 
-      const response = await axios.post("/api/notes/add", formData);
-      getNotes();
-      setAddingVisible(false);
-      sendSlackMessage(userId, response.data.imageURL);
-      console.log(response);
-    } catch (err) {
-      console.error(err);
+        const response = await axios.post("/api/notes/add", formData);
+        getNotes();
+        setAddingVisible(false);
+        sendSlackMessage(userId, response.data.imageURL);
+        setFormSubmitted(false);
+        console.log(response);
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
   return (
@@ -97,6 +102,7 @@ export default function AddNotePopup({ setAddingVisible, getNotes }) {
             name=""
             id="noteTitleInput"
             autoComplete="off"
+            maxLength={50}
             className="h-10 border-2 border-slate-400 rounded mb-4"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -107,6 +113,7 @@ export default function AddNotePopup({ setAddingVisible, getNotes }) {
           <textarea
             name=""
             id="noteDescInput"
+            maxLength={200}
             className="h-35 min-h-30 border-2 mb-3 border-slate-400 rounded resize-none"
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
@@ -119,7 +126,7 @@ export default function AddNotePopup({ setAddingVisible, getNotes }) {
           />
           <input
             type="submit"
-            value="Submit"
+            value={formSubmitted ? "Loading..." : "Submit"}
             className="flex rounded px-4 my-2 h-10 w-fit mx-auto font-bold text-black text-lg border border-slate-400 cursor-pointer bg-slate-100 hover:scale-105 transition-all"
           />
         </form>

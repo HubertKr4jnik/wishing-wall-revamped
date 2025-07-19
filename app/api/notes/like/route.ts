@@ -10,10 +10,15 @@ export async function POST(req: NextRequest) {
     const likedBy = foundNote.likedBy;
 
     if (likedBy.includes(userId)) {
-      console.log("[api/like] [Note already liked, returning it back]");
-      return NextResponse.json(foundNote, { status: 200 });
+      console.log(`[api/like] [Unliking note ${noteId}]`);
+      const updatedNote = await Note.findByIdAndUpdate(
+        noteId,
+        { $inc: { likes: -1 }, $pull: { likedBy: userId } },
+        { new: true }
+      );
+      return NextResponse.json(updatedNote, { status: 200 });
     } else {
-      console.log(`[api/like] [Updating note ${noteId}]`);
+      console.log(`[api/like] [Liking note ${noteId}]`);
       const updatedNote = await Note.findByIdAndUpdate(
         noteId,
         { $inc: { likes: 1 }, $push: { likedBy: userId } },

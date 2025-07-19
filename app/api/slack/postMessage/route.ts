@@ -19,7 +19,7 @@ export async function POST(req: any) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `<@${userId}> just wished for \`<https://hc-cdn.hel1.your-objectstorage.com/s/v3/74fa205892d759a0275d77d2197919a34d73597a_image.png | ${title}>\``,
+          text: `<@${userId}> just wished for \`<https://hc-cdn.hel1.your-objectstorage.com/s/v3/41e9de19cfa4e099cf25410ac38542776693b54e_t.png | ${title}>\``,
         },
       },
       {
@@ -33,7 +33,7 @@ export async function POST(req: any) {
 
     if (
       imageURL !==
-      "https://img.freepik.com/free-vector/illustration-gallery-icon_53876-27002.jpg"
+      "https://hc-cdn.hel1.your-objectstorage.com/s/v3/41e9de19cfa4e099cf25410ac38542776693b54e_t.png"
     ) {
       message.push({
         type: "image",

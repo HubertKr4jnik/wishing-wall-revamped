@@ -17,39 +17,43 @@ export async function POST(req: NextRequest) {
     const profileURL = formData.get("profileURL");
     let file = formData.get("file");
     let imageURL =
-      "https://img.freepik.com/free-vector/illustration-gallery-icon_53876-27002.jpg";
+      "https://hc-cdn.hel1.your-objectstorage.com/s/v3/41e9de19cfa4e099cf25410ac38542776693b54e_t.png";
 
     console.log(`[api/notes/add] [Recieved file:]`);
     console.log(file);
 
-    if (file !== null) {
-      const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+    if (file) {
+      const filetype = file.type.split("/")[0];
+      if (filetype === "image") {
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
 
-      const uploadForm = new FormData();
-      uploadForm.append("file", buffer, file.name);
+        const uploadForm = new FormData();
+        uploadForm.append("file", buffer, file.name);
 
-      const response = await axios.post(
-        "https://tmpfiles.org/api/v1/upload",
-        uploadForm
-      );
+        const response = await axios.post(
+          "https://tmpfiles.org/api/v1/upload",
+          uploadForm
+        );
 
-      let tempfilesURL = response.data.data.url;
-      tempfilesURL = tempfilesURL.split(".org");
-      tempfilesURL = tempfilesURL.join(".org/dl");
+        let tempfilesURL = response.data.data.url;
+        tempfilesURL = tempfilesURL.split(".org");
+        tempfilesURL = tempfilesURL.join(".org/dl");
 
-      const cdnResponse = await axios.post(
-        "https://cdn.hackclub.com/api/v3/new",
-        [tempfilesURL],
-        {
-          headers: {
-            Authorization: "Bearer beans",
-          },
-        }
-      );
+        const cdnResponse = await axios.post(
+          "https://cdn.hackclub.com/api/v3/new",
+          [tempfilesURL],
+          {
+            headers: {
+              Authorization: "Bearer beans",
+            },
+          }
+        );
 
-      imageURL = cdnResponse.data.files[0].deployedUrl;
+        imageURL = cdnResponse.data.files[0].deployedUrl;
+      }
     }
+
     console.log(`[api/notes/add] [CDN image link: ${imageURL}]`);
 
     const newNote = new Note({
