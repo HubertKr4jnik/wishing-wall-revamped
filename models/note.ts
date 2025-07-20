@@ -10,6 +10,7 @@ const noteSchema = new mongoose.Schema(
     likes: { type: Number },
     likedBy: { type: Array },
     imageURL: { type: String },
+    messageTimestamp: { type: String },
   },
   {
     timestamps: true,

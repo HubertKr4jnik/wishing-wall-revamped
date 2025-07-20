@@ -19,6 +19,7 @@ export default function AddNotePopup({
 
   const sendSlackMessage = async (
     userId: string,
+    noteId: string,
     imageURL: string,
     productLink: string
   ) => {
@@ -27,6 +28,7 @@ export default function AddNotePopup({
         title,
         desc,
         userId,
+        noteId,
         imageURL,
         productLink,
       });
@@ -74,7 +76,12 @@ export default function AddNotePopup({
         const response = await axios.post("/api/notes/add", formData);
         getNotes();
         setAddingVisible(false);
-        sendSlackMessage(userId, response.data.imageURL, links[0]);
+        sendSlackMessage(
+          userId,
+          response.data._id.toString(),
+          response.data.imageURL,
+          links[0]
+        );
         setInfoPopupVisible(true);
         setInfoPopupSuccess(true);
         setInfoPopupText("Added note successfully");

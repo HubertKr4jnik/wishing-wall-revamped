@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@slack/web-api": "^7.9.3",
     "axios": "^1.10.0",
     "form-data": "^4.0.4",
     "mongoose": "^8.16.3",

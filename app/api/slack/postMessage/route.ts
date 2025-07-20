@@ -1,9 +1,14 @@
-import axios from "axios";
 import { NextResponse } from "next/server";
+import { WebClient } from "@slack/web-api";
+import DatabaseConnection from "@/lib/mongoose";
+import Note from "@/models/note";
 
 export async function POST(req: any) {
+  const client = new WebClient(process.env.SLACK_BOT_TOKEN);
+  await DatabaseConnection();
   try {
-    let { title, desc, userId, imageURL, productLink } = await req.json();
+    let { title, desc, userId, noteId, imageURL, productLink } =
+      await req.json();
 
     title = title
       .replace(/&/g, "&amp;")
@@ -53,8 +58,14 @@ export async function POST(req: any) {
       });
     }
 
-    const response = await axios.post(process.env.SLACK_WEBHOOK_URL as string, {
+    const response = await client.chat.postMessage({
+      channel: process.env.SLACK_CHANNEL_ID as string,
+      text: `New wish for ${title}`,
       blocks: message,
+    });
+
+    await Note.findByIdAndUpdate(noteId, {
+      messageTimestamp: response.message.ts,
     });
 
     return NextResponse.json({ status: 200 });
