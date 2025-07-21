@@ -66,6 +66,7 @@ export async function POST(req: NextRequest) {
       likedBy: [],
       imageURL,
       messageTimestamp: null,
+      lastReactionTimestamp: Date.now(),
     });
     await newNote.save();
     return NextResponse.json(newNote, { status: 200 });

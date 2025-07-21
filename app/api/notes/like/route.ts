@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
         { new: true }
       );
       try {
-        await LikeMessage(false, updatedNote.messageTimestamp);
+        // await LikeMessage(false, updatedNote.messageTimestamp);
       } catch (err) {
         console.error(err);
       }
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
         { new: true }
       );
       try {
-        await LikeMessage(true, updatedNote.messageTimestamp);
+        // await LikeMessage(true, updatedNote.messageTimestamp);
       } catch (err) {
         console.error(err);
       }
