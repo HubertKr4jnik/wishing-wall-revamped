@@ -13,7 +13,12 @@ export async function POST(req: NextRequest) {
 
   if (body.event.type === "reaction_added" && body.event.reaction === "heart") {
     const note = await Note.findOne({ messageTimestamp: body.event.item.ts });
-    if (!note.likedBy.includes(body.event.user)) {
+
+    const recentUpdate =
+      note.lastReactionUpdate &&
+      Date.now() - note.lastReactionUpdate.getTime() < 2000;
+
+    if (!note.likedBy.includes(body.event.user) && !recentUpdate) {
       await Note.findOneAndUpdate(
         { messageTimestamp: body.event.item.ts },
         {
@@ -30,7 +35,12 @@ export async function POST(req: NextRequest) {
     body.event.reaction === "heart"
   ) {
     const note = await Note.findOne({ messageTimestamp: body.event.item.ts });
-    if (note.likedBy.includes(body.event.user)) {
+
+    const recentUpdate =
+      note.lastReactionUpdate &&
+      Date.now() - note.lastReactionUpdate.getTime() < 2000;
+
+    if (note.likedBy.includes(body.event.user) && !recentUpdate) {
       await Note.findOneAndUpdate(
         { messageTimestamp: body.event.item.ts },
         { $inc: { likes: -1 }, $pull: { likedBy: body.event.user } },

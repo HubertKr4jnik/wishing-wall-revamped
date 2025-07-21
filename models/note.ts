@@ -11,6 +11,7 @@ const noteSchema = new mongoose.Schema(
     likedBy: { type: Array },
     imageURL: { type: String },
     messageTimestamp: { type: String },
+    lastReactionUpdate: { type: Date },
   },
   {
     timestamps: true,

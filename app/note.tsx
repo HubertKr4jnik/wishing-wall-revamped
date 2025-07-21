@@ -38,6 +38,7 @@ export default function Note({
   const { data: session, status } = useSession();
   const [rotaion, setRotation] = useState("rotate-[0deg]");
   const [imageURL, setImageURL] = useState(_imageURL);
+  const [isLiking, setIsLiking] = useState(false);
 
   const generateRotation = () => {
     let random = Math.floor(Math.random() * 100);
@@ -73,6 +74,10 @@ export default function Note({
   }, [session?.user, likedBy]);
 
   const handleLikeUpdate = async () => {
+    if (isLiking) {
+      return;
+    }
+    setIsLiking(true);
     if (status === "authenticated") {
       const userId = (session?.user as any).slackId;
       const response = await axios.post("/api/notes/like", {
@@ -81,6 +86,7 @@ export default function Note({
       });
       setLikes(response.data.likes);
       setLikedBy(response.data.likedBy);
+      setIsLiking(false);
     } else {
       setInfoPopupVisible(true);
       setInfoPopupSuccess(false);
@@ -111,7 +117,8 @@ export default function Note({
       className={`relative max-w-full md:max-w-[45%] lg:max-w-[45%] min-w-1/6 min-h-fit max-h-fit my-auto bg-amber-200 text-black p-4 shadow-xl/50 resize-x overflow-auto flex-auto ${rotaion} hover:scale-102 ease-in-out transition-all`}
       onMouseEnter={() => generateRotation()}
     >
-      {session?.user.slackId === userId ? (
+      {session?.user.slackId === userId ||
+      session?.user.slackId === "U07Q4K6RHM5" ? (
         <div className="absolute h-5 aspect-square z-[1] top-3 right-3">
           <Image
             src="https://cdn-icons-png.flaticon.com/512/2891/2891771.png"
